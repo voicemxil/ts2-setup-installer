@@ -374,6 +374,8 @@ begin
   for I := 0 to WizardForm.ComponentsList.Items.Count - 1 do
     if Pos(Sub, WizardForm.ComponentsList.ItemCaption[I]) > 0 then
     begin
+      // The checklist ignores state changes on disabled rows, so enable first.
+      WizardForm.ComponentsList.ItemEnabled[I] := True;
       WizardForm.ComponentsList.Checked[I] := Chk;
       WizardForm.ComponentsList.ItemEnabled[I] := False;
     end;
