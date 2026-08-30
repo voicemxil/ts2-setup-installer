@@ -24,6 +24,9 @@
 #define UrlHoodFX         "https://github.com/spockthewok/TS2VisibleHoodFX/releases/download/v1.2.0/TS2VisibleHoodFX.zip"
 #define UrlWaterAsi       "https://github.com/spockthewok/TS2ReflectiveWater/releases/download/v1.4.0/TS2ReflectiveWater.asi"
 #define UrlWaterShaders   "https://github.com/spockthewok/TS2ReflectiveWater/releases/download/v1.4.0/Shaders.zip"
+#define UrlSoftShadow100  "https://www.simfileshare.net/download/2751461/"   ; ld_SoftShadows_NoOverlap_100.package (raw)
+#define UrlSoftShadow50   "https://www.simfileshare.net/download/2751459/"   ; ld_SoftShadows_NoOverlap_50.package (raw)
+#define UrlSoftShadowOv   "https://www.simfileshare.net/download/2751460/"   ; ld_SoftShadows_Overlap.package (raw)
 #define UrlCozyHome       "https://github.com/thedreadpirates/ts2-lightingmod-cozyhome/releases/download/2.0.0/vvqb_lightingmod_cozyhome.zip"
 #define UrlShadowFix      "https://chii.modthesims.info/getfile.php?file=1591074&v=1735832737"  ; simNopke Sim Shadow Fix (medium), MTS 569585 - UC only
 #define UrlPieMenuFix     "https://chii.modthesims.info/getfile.php?file=896931&v=1238158182"   ; Lord Darcy Pie Menu Text Strings Fix (FT/AL/M&G), MTS 304594
@@ -51,22 +54,39 @@ SetupLogging=yes
 Uninstallable=no
 ArchiveExtraction=full
 
-[Tasks]
-; Mandatory core (no checkbox): launcher (Sims2RPC / TS2 Extender), Graphics Rules, VC++/.NET deps.
-Name: "cep";        Description: "Install the CEP - Color Enable Package (by Numenor && RGiles)"
-Name: "piemenu";    Description: "Install the Pie Menu Text Strings Fix (by Lord Darcy)"
-Name: "uifonts";    Description: "Install the UI Text Fonts Fix for AL/M&&G"
-Name: "shadowfix";  Description: "Install the Sim Shadow Fix (by simNopke)"; Check: not IsLegacy
-Name: "brightcas";  Description: "Install the Overly Bright CAS Fix (by Lazy Duchess)"; Check: not IsLegacy
-Name: "memcap";     Description: "Install the pink flashing fix (TS2MemCapRemover by SpockTheWok)"; Check: not IsLegacy
-Name: "memcap\v2";  Description: "Version 2 (safer, recommended)"; Flags: exclusive; Check: not IsLegacy
-Name: "memcap\v1";  Description: "Version 1 (original)"; Flags: exclusive unchecked; Check: not IsLegacy
-Name: "hoodfx";     Description: "Install TS2VisibleHoodFX (neighborhood effects visible in lot view, by SpockTheWok)"; Flags: unchecked
-Name: "water";      Description: "Install TS2ReflectiveWater (improved water reflections, by SpockTheWok)"; Flags: unchecked
-Name: "cozyhome";   Description: "Install the Cozy Home lighting mod (by dreadpirate)"; Flags: unchecked; Check: not IsDiscLayout
+[Types]
+Name: "recommended"; Description: "Recommended (core + essential fixes)"
+Name: "full";        Description: "Full (fixes + graphical extras + lighting)"
+Name: "custom";      Description: "Custom"; Flags: iscustom
+
+[Components]
+; Core is mandatory. Edition-specific rows are greyed out at runtime (CurPageChanged) -
+; [Components] entries can't use Check: functions.
+Name: "core";            Description: "Core: launcher (Sims2RPC / TS2 Extender), Graphics Rules, dependencies"; Types: recommended full custom; Flags: fixed
+Name: "fixes";           Description: "Essential fixes"; Types: recommended full
+Name: "fixes\cep";       Description: "CEP - Color Enable Package (by Numenor && RGiles)"; Types: recommended full
+Name: "fixes\piemenu";   Description: "Pie Menu Text Strings Fix (by Lord Darcy)"; Types: recommended full custom; Flags: fixed
+Name: "fixes\uifonts";   Description: "UI Text Fonts Fix for AL/M&&G"; Types: recommended full custom; Flags: fixed
+Name: "fixes\shadow";    Description: "Sim Shadow Fix (by simNopke) - Ultimate Collection/disc only"; Types: recommended full
+Name: "fixes\brightcas"; Description: "Overly Bright CAS Fix (by Lazy Duchess) - Ultimate Collection/disc only"; Types: recommended full
+Name: "fixes\memcap";    Description: "Pink flashing fix (TS2MemCapRemover by SpockTheWok) - Ultimate Collection/disc only"; Types: recommended full
+Name: "fixes\memcap\v2"; Description: "Version 2 (safer, recommended)"; Types: recommended full; Flags: exclusive
+Name: "fixes\memcap\v1"; Description: "Version 1 (original)"; Flags: exclusive
+Name: "gfx";                     Description: "Graphical && shader tweaks"; Types: full
+Name: "gfx\hoodfx";              Description: "TS2VisibleHoodFX - neighborhood effects in lot view (by SpockTheWok)"; Types: full
+Name: "gfx\water";               Description: "TS2ReflectiveWater - improved water reflections (by SpockTheWok)"; Types: full
+Name: "gfx\softshadows";         Description: "Soft Outdoor Shadows 2.0 (by Lazy Duchess)"; Types: full
+Name: "gfx\softshadows\no100";   Description: "No Overlap 100 - detailed, best with high-res RPC shadows (recommended)"; Types: full; Flags: exclusive
+Name: "gfx\softshadows\no50";    Description: "No Overlap 50 - softer, more overlap artifacts"; Flags: exclusive
+Name: "gfx\softshadows\overlap"; Description: "Overlap - fully soft shadows"; Flags: exclusive
 ; TODO: if a d3d9.dll already exists in TSBin, warn before overwriting - the user may have
 ; their own DXVK build/config (e.g. an HDR-tuned dxvk.conf) in place.
-Name: "dxvk";       Description: "Install DXVK (recommended for AMD RX 400+ GPUs; requires Vulkan 1.3)"; Flags: unchecked
+Name: "gfx\dxvk";                Description: "DXVK - D3D9-to-Vulkan (recommended for AMD RX 400+; requires Vulkan 1.3)"; Types: full
+Name: "lighting";                Description: "Lighting"; Types: full
+Name: "lighting\cozyhome";       Description: "Cozy Home lighting mod (by dreadpirate)"; Types: full
+
+[Tasks]
+; Tasks = install tweaks only; actual components/mods live on the Components page.
 Name: "shortcuts";  Description: "Create Start Menu && Desktop shortcuts for Sims2RPC"; Check: not IsLegacy
 
 [Code]
@@ -335,6 +355,37 @@ begin
     Result := (GEdition <> edBoth);
 end;
 
+// [Components] entries can't use Check:, so grey out rows that don't apply
+// to the detected/chosen edition when the components page is shown.
+procedure DisableComponentByCaption(const Sub: string);
+var
+  I: Integer;
+begin
+  for I := 0 to WizardForm.ComponentsList.Items.Count - 1 do
+    if Pos(Sub, WizardForm.ComponentsList.ItemCaption[I]) > 0 then
+    begin
+      WizardForm.ComponentsList.Checked[I] := False;
+      WizardForm.ComponentsList.ItemEnabled[I] := False;
+    end;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if CurPageID = wpSelectComponents then
+  begin
+    if GUseLegacy then
+    begin
+      DisableComponentByCaption('Sim Shadow Fix');
+      DisableComponentByCaption('Bright CAS');
+      DisableComponentByCaption('Pink flashing');
+      DisableComponentByCaption('Version 2 (safer');
+      DisableComponentByCaption('Version 1 (original');
+    end;
+    if IsDiscLayout() then
+      DisableComponentByCaption('Cozy Home');
+  end;
+end;
+
 // ===========================================================================
 // Dependency presence checks (skip downloads/installs already satisfied)
 // ===========================================================================
@@ -391,17 +442,15 @@ begin
   GHave.Clear;
   GSkippedComponents := '';
   AddDl('{#UrlGraphicsRules}', 'GraphicsRules.sgr');
-  if WizardIsTaskSelected('cep') then
+  if WizardIsComponentSelected('fixes\cep') then
     AddDl('{#UrlCEP}', 'CEP.zip');
-  if WizardIsTaskSelected('piemenu') then
-    AddDl('{#UrlPieMenuFix}', 'PieMenu.zip');
-  if WizardIsTaskSelected('uifonts') then
-    AddDl('{#UrlUIFontsFix}', 'UIFonts.zip');  // AL/MG font regression persists in Legacy; no conflict with its UI scaler
+  AddDl('{#UrlPieMenuFix}', 'PieMenu.zip');   // mandatory
+  AddDl('{#UrlUIFontsFix}', 'UIFonts.zip');   // mandatory; AL/MG regression persists in Legacy, no scaler conflict
   if not GUseLegacy then
   begin
-    if WizardIsTaskSelected('shadowfix') then
+    if WizardIsComponentSelected('fixes\shadow') then
       AddDl('{#UrlShadowFix}', 'ShadowFix.zip');       // Legacy: EA fixed shadows
-    if WizardIsTaskSelected('brightcas') then
+    if WizardIsComponentSelected('fixes\brightcas') then
       AddDl('{#UrlBrightCAS}', 'ld_BrightCASFix.package');  // raw package, no extraction
   end;
   if GUseLegacy then
@@ -411,9 +460,9 @@ begin
   else
   begin
     AddDl('{#UrlSims2RPC}', 'Sims2RPC.zip');
-    if WizardIsTaskSelected('memcap') then
+    if WizardIsComponentSelected('fixes\memcap') then
     begin
-      if WizardIsTaskSelected('memcap\v1') then
+      if WizardIsComponentSelected('fixes\memcap\v1') then
         AddDl('{#UrlMemCapV1}', 'TS2MemCapRemover.asi')
       else
         AddDl('{#UrlMemCapV2}', 'TS2MemCapRemover.asi');
@@ -421,16 +470,25 @@ begin
     if NeedDotNet48() then
       AddDl('{#UrlNDP48}', 'ndp48-web.exe');
   end;
-  if WizardIsTaskSelected('hoodfx') then
+  if WizardIsComponentSelected('gfx\hoodfx') then
     AddDl('{#UrlHoodFX}', 'HoodFX.zip');
-  if WizardIsTaskSelected('water') then
+  if WizardIsComponentSelected('gfx\water') then
   begin
     AddDl('{#UrlWaterAsi}', 'TS2ReflectiveWater.asi');
     AddDl('{#UrlWaterShaders}', 'WaterShaders.zip');
   end;
-  if WizardIsTaskSelected('cozyhome') then
+  if WizardIsComponentSelected('gfx\softshadows') then
+  begin
+    if WizardIsComponentSelected('gfx\softshadows\no50') then
+      AddDl('{#UrlSoftShadow50}', 'SoftShadows.package')
+    else if WizardIsComponentSelected('gfx\softshadows\overlap') then
+      AddDl('{#UrlSoftShadowOv}', 'SoftShadows.package')
+    else
+      AddDl('{#UrlSoftShadow100}', 'SoftShadows.package');
+  end;
+  if WizardIsComponentSelected('lighting\cozyhome') and not IsDiscLayout() then
     AddDl('{#UrlCozyHome}', 'CozyHome.zip');
-  if WizardIsTaskSelected('dxvk') then
+  if WizardIsComponentSelected('gfx\dxvk') then
     AddDl('{#UrlDXVK}', 'dxvk.tar.gz');
   if NeedVCRedistX86() then
     AddDl('{#UrlVCRedist}', 'vc_redist.x86.exe');
@@ -756,6 +814,20 @@ begin
     ExtractTo('WaterShaders.zip', ExpandConstant('{tmp}\watershaders'));
     FileCopy(ExpandConstant('{tmp}\watershaders\01 - Maxis\zzz_Castaway_Shaders.package'),
              AddBackslash(Downloads) + 'zzz_Castaway_Shaders.package', False);
+  end;
+
+  // Soft Outdoor Shadows: raw .package -> Downloads, named per chosen variant
+  if Downloaded('SoftShadows.package') then
+  begin
+    if WizardIsComponentSelected('gfx\softshadows\no50') then
+      FileCopy(ExpandConstant('{tmp}\SoftShadows.package'),
+               AddBackslash(Downloads) + 'ld_SoftShadows_NoOverlap_50.package', False)
+    else if WizardIsComponentSelected('gfx\softshadows\overlap') then
+      FileCopy(ExpandConstant('{tmp}\SoftShadows.package'),
+               AddBackslash(Downloads) + 'ld_SoftShadows_Overlap.package', False)
+    else
+      FileCopy(ExpandConstant('{tmp}\SoftShadows.package'),
+               AddBackslash(Downloads) + 'ld_SoftShadows_NoOverlap_100.package', False);
   end;
 
   // Cozy Home lighting: edition folder -> game root, 4.0 -> Downloads, cheat merge
