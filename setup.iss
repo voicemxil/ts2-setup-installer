@@ -63,15 +63,16 @@ Name: "custom";      Description: "Custom"; Flags: iscustom
 ; Core is mandatory. Edition-specific rows are greyed out at runtime (CurPageChanged) -
 ; [Components] entries can't use Check: functions.
 Name: "core";            Description: "Core: launcher (Sims2RPC / TS2 Extender), Graphics Rules, dependencies"; Types: recommended full custom; Flags: fixed
-Name: "fixes";           Description: "Essential fixes"; Types: recommended full
-Name: "fixes\cep";       Description: "CEP - Color Enable Package (by Numenor && RGiles)"; Types: recommended full
+Name: "fixes";           Description: "Essential fixes (mandatory)"; Types: recommended full custom; Flags: fixed
 Name: "fixes\piemenu";   Description: "Pie Menu Text Strings Fix (by Lord Darcy)"; Types: recommended full custom; Flags: fixed
 Name: "fixes\uifonts";   Description: "UI Text Fonts Fix for AL/M&&G"; Types: recommended full custom; Flags: fixed
-Name: "fixes\shadow";    Description: "Sim Shadow Fix (by simNopke) - Ultimate Collection/disc only"; Types: recommended full
-Name: "fixes\brightcas"; Description: "Overly Bright CAS Fix (by Lazy Duchess) - Ultimate Collection/disc only"; Types: recommended full
-Name: "fixes\memcap";    Description: "Pink flashing fix (TS2MemCapRemover by SpockTheWok) - Ultimate Collection/disc only"; Types: recommended full
-Name: "fixes\memcap\v2"; Description: "Version 2 (safer, recommended)"; Types: recommended full; Flags: exclusive
+Name: "fixes\shadow";    Description: "Sim Shadow Fix (by simNopke) - Ultimate Collection/disc only"; Types: recommended full custom; Flags: fixed
+Name: "fixes\brightcas"; Description: "Overly Bright CAS Fix (by Lazy Duchess) - Ultimate Collection/disc only"; Types: recommended full custom; Flags: fixed
+Name: "fixes\memcap";    Description: "Pink flashing fix (TS2MemCapRemover by SpockTheWok) - Ultimate Collection/disc only"; Types: recommended full custom; Flags: fixed
+Name: "fixes\memcap\v2"; Description: "Version 2 (safer, recommended)"; Types: recommended full custom; Flags: exclusive
 Name: "fixes\memcap\v1"; Description: "Version 1 (original)"; Flags: exclusive
+Name: "modding";         Description: "Modding extensions"; Types: recommended full
+Name: "modding\cep";     Description: "CEP - Color Enable Package (by Numenor && RGiles)"; Types: recommended full
 Name: "gfx";                     Description: "Graphical && shader tweaks"; Types: full
 Name: "gfx\hoodfx";              Description: "TS2VisibleHoodFX - neighborhood effects in lot view (by SpockTheWok)"; Types: full
 Name: "gfx\water";               Description: "TS2ReflectiveWater - improved water reflections (by SpockTheWok)"; Types: full
@@ -442,16 +443,15 @@ begin
   GHave.Clear;
   GSkippedComponents := '';
   AddDl('{#UrlGraphicsRules}', 'GraphicsRules.sgr');
-  if WizardIsComponentSelected('fixes\cep') then
+  if WizardIsComponentSelected('modding\cep') then
     AddDl('{#UrlCEP}', 'CEP.zip');
-  AddDl('{#UrlPieMenuFix}', 'PieMenu.zip');   // mandatory
-  AddDl('{#UrlUIFontsFix}', 'UIFonts.zip');   // mandatory; AL/MG regression persists in Legacy, no scaler conflict
+  // Essential fixes: mandatory (edition-gated only)
+  AddDl('{#UrlPieMenuFix}', 'PieMenu.zip');
+  AddDl('{#UrlUIFontsFix}', 'UIFonts.zip');   // AL/MG regression persists in Legacy, no scaler conflict
   if not GUseLegacy then
   begin
-    if WizardIsComponentSelected('fixes\shadow') then
-      AddDl('{#UrlShadowFix}', 'ShadowFix.zip');       // Legacy: EA fixed shadows
-    if WizardIsComponentSelected('fixes\brightcas') then
-      AddDl('{#UrlBrightCAS}', 'ld_BrightCASFix.package');  // raw package, no extraction
+    AddDl('{#UrlShadowFix}', 'ShadowFix.zip');            // Legacy: EA fixed shadows
+    AddDl('{#UrlBrightCAS}', 'ld_BrightCASFix.package');  // raw package, no extraction
   end;
   if GUseLegacy then
   begin
@@ -460,13 +460,11 @@ begin
   else
   begin
     AddDl('{#UrlSims2RPC}', 'Sims2RPC.zip');
-    if WizardIsComponentSelected('fixes\memcap') then
-    begin
-      if WizardIsComponentSelected('fixes\memcap\v1') then
-        AddDl('{#UrlMemCapV1}', 'TS2MemCapRemover.asi')
-      else
-        AddDl('{#UrlMemCapV2}', 'TS2MemCapRemover.asi');
-    end;
+    // MemCap is mandatory on UC/disc; only the version is a choice
+    if WizardIsComponentSelected('fixes\memcap\v1') then
+      AddDl('{#UrlMemCapV1}', 'TS2MemCapRemover.asi')
+    else
+      AddDl('{#UrlMemCapV2}', 'TS2MemCapRemover.asi');
     if NeedDotNet48() then
       AddDl('{#UrlNDP48}', 'ndp48-web.exe');
   end;
