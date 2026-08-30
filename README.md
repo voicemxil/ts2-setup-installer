@@ -1,6 +1,6 @@
-﻿# The Sims 2 Setup Kit
+# The Sims 2 Setup Kit
 
-Post-install setup tool for The Sims 2 â€” applies modern-system fixes to an **existing** installation of the Ultimate Collection, Legacy Collection, or disc version.
+Post-install setup tool for The Sims 2 — applies modern-system fixes to an **existing** installation of the Ultimate Collection, Legacy Collection, or disc version.
 
 Companion to the [Sims 2 Setup Guide](https://voicemxil.github.io/ts2-setup-guide/).
 
