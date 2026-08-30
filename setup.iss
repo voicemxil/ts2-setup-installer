@@ -66,9 +66,11 @@ Name: "core";            Description: "Core: launcher (Sims2RPC / TS2 Extender),
 Name: "fixes";           Description: "Essential fixes (mandatory)"; Types: recommended full custom; Flags: fixed
 Name: "fixes\piemenu";   Description: "Pie Menu Text Strings Fix (by Lord Darcy)"; Types: recommended full custom; Flags: fixed
 Name: "fixes\uifonts";   Description: "UI Text Fonts Fix for AL/M&&G"; Types: recommended full custom; Flags: fixed
-Name: "fixes\shadow";    Description: "Sim Shadow Fix (by simNopke) - Ultimate Collection/disc only"; Types: recommended full custom; Flags: fixed
-Name: "fixes\brightcas"; Description: "Overly Bright CAS Fix (by Lazy Duchess) - Ultimate Collection/disc only"; Types: recommended full custom; Flags: fixed
-Name: "fixes\memcap";    Description: "Pink flashing fix (TS2MemCapRemover by SpockTheWok) - Ultimate Collection/disc only"; Types: recommended full custom; Flags: fixed
+; Edition-dependent "mandatory" rows: NOT flagged fixed (the control would reassert
+; Types state and undo runtime gating) - mandatory is enforced in ApplyEditionGating.
+Name: "fixes\shadow";    Description: "Sim Shadow Fix (by simNopke) - Ultimate Collection/disc only"; Types: recommended full custom
+Name: "fixes\brightcas"; Description: "Overly Bright CAS Fix (by Lazy Duchess) - Ultimate Collection/disc only"; Types: recommended full custom
+Name: "fixes\memcap";    Description: "Pink flashing fix (TS2MemCapRemover by SpockTheWok) - Ultimate Collection/disc only"; Types: recommended full custom
 Name: "fixes\memcap\v2"; Description: "Version 2 (safer, recommended)"; Types: recommended full custom; Flags: exclusive
 Name: "fixes\memcap\v1"; Description: "Version 1 (original)"; Flags: exclusive
 Name: "modding";         Description: "Modding extensions"; Types: recommended full
@@ -364,14 +366,15 @@ var
   GOrigClickCheck: TNotifyEvent;
   GHooked: Boolean;
 
-procedure DisableComponentByCaption(const Sub: string);
+// Force a row to a state and lock it against user toggling.
+procedure ForceComponentByCaption(const Sub: string; const Chk: Boolean);
 var
   I: Integer;
 begin
   for I := 0 to WizardForm.ComponentsList.Items.Count - 1 do
     if Pos(Sub, WizardForm.ComponentsList.ItemCaption[I]) > 0 then
     begin
-      WizardForm.ComponentsList.Checked[I] := False;
+      WizardForm.ComponentsList.Checked[I] := Chk;
       WizardForm.ComponentsList.ItemEnabled[I] := False;
     end;
 end;
@@ -380,14 +383,22 @@ procedure ApplyEditionGating();
 begin
   if GUseLegacy then
   begin
-    DisableComponentByCaption('Sim Shadow Fix');
-    DisableComponentByCaption('Bright CAS');
-    DisableComponentByCaption('Pink flashing');  // part of TS2 Extender on Legacy
-    DisableComponentByCaption('Version 2 (safer');
-    DisableComponentByCaption('Version 1 (original');
+    // Not applicable on Legacy (pink flash fix is part of TS2 Extender there)
+    ForceComponentByCaption('Sim Shadow Fix', False);
+    ForceComponentByCaption('Bright CAS', False);
+    ForceComponentByCaption('Pink flashing', False);
+    ForceComponentByCaption('Version 2 (safer', False);
+    ForceComponentByCaption('Version 1 (original', False);
+  end
+  else
+  begin
+    // Mandatory on UC/disc (version radios stay user-selectable)
+    ForceComponentByCaption('Sim Shadow Fix', True);
+    ForceComponentByCaption('Bright CAS', True);
+    ForceComponentByCaption('Pink flashing', True);
   end;
   if IsDiscLayout() then
-    DisableComponentByCaption('Cozy Home');
+    ForceComponentByCaption('Cozy Home', False);
 end;
 
 procedure TypesComboChanged(Sender: TObject);
