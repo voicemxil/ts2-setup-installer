@@ -356,8 +356,14 @@ begin
     Result := (GEdition <> edBoth);
 end;
 
-// [Components] entries can't use Check:, so grey out rows that don't apply
-// to the detected/chosen edition when the components page is shown.
+// [Components] entries can't use Check:, so grey out rows that don't apply to the
+// detected/chosen edition. Inno rebuilds the checklist from Types every time the
+// preset dropdown changes, so the gating must be re-applied after every change.
+var
+  GOrigTypesChange: TNotifyEvent;
+  GOrigClickCheck: TNotifyEvent;
+  GHooked: Boolean;
+
 procedure DisableComponentByCaption(const Sub: string);
 var
   I: Integer;
@@ -370,20 +376,45 @@ begin
     end;
 end;
 
+procedure ApplyEditionGating();
+begin
+  if GUseLegacy then
+  begin
+    DisableComponentByCaption('Sim Shadow Fix');
+    DisableComponentByCaption('Bright CAS');
+    DisableComponentByCaption('Pink flashing');  // part of TS2 Extender on Legacy
+    DisableComponentByCaption('Version 2 (safer');
+    DisableComponentByCaption('Version 1 (original');
+  end;
+  if IsDiscLayout() then
+    DisableComponentByCaption('Cozy Home');
+end;
+
+procedure TypesComboChanged(Sender: TObject);
+begin
+  if GOrigTypesChange <> nil then GOrigTypesChange(Sender);
+  ApplyEditionGating();
+end;
+
+procedure ComponentsClickCheck(Sender: TObject);
+begin
+  if GOrigClickCheck <> nil then GOrigClickCheck(Sender);
+  ApplyEditionGating();
+end;
+
 procedure CurPageChanged(CurPageID: Integer);
 begin
   if CurPageID = wpSelectComponents then
   begin
-    if GUseLegacy then
+    if not GHooked then
     begin
-      DisableComponentByCaption('Sim Shadow Fix');
-      DisableComponentByCaption('Bright CAS');
-      DisableComponentByCaption('Pink flashing');
-      DisableComponentByCaption('Version 2 (safer');
-      DisableComponentByCaption('Version 1 (original');
+      GOrigTypesChange := WizardForm.TypesCombo.OnChange;
+      WizardForm.TypesCombo.OnChange := @TypesComboChanged;
+      GOrigClickCheck := WizardForm.ComponentsList.OnClickCheck;
+      WizardForm.ComponentsList.OnClickCheck := @ComponentsClickCheck;
+      GHooked := True;
     end;
-    if IsDiscLayout() then
-      DisableComponentByCaption('Cozy Home');
+    ApplyEditionGating();
   end;
 end;
 
